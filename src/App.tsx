@@ -42,9 +42,18 @@ function CameraController({ step }: { step: number }) {
 
 function MusicPlayer() {
   const [playing, setPlaying] = useState(false);
-  const audio = new Audio("/backgroundMusic.mp3");
-
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  
   const toggleMusic = () => {
+    if (!audioRef.current) {
+      const audio = new Audio("/backgroundMusic.mp3");
+      audio.loop = true;
+      audio.volume = 0.5;
+      audioRef.current = audio;
+    }
+
+    const audio = audioRef.current;
+
     if (!playing) {
       audio.loop = true;
       audio.play();
