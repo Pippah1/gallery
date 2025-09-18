@@ -1,35 +1,88 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import "./App.css";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { useGLTF, Environment, PerspectiveCamera } from "@react-three/drei";
+import { useRef, useState } from "react";
+import * as THREE from "three";
 
-function App() {
-  const [count, setCount] = useState(0)
+function Gallery() {
+  const gltf = useGLTF("/scene.glb");
+  console.log(gltf.scene);
+  return <primitive object={gltf.scene} />;
+}
+
+interface CameraStop {
+  position: THREE.Vector3;
+  target: THREE.Vector3;
+}
+
+const cameraStops: CameraStop[] = [
+  { position: new THREE.Vector3(-2, 2, -12), target: new THREE.Vector3(-2, -1, -11) },
+  { position: new THREE.Vector3(2, 3, 0), target: new THREE.Vector3(6, 0, 0) },
+  { position: new THREE.Vector3(5, -2, 0), target: new THREE.Vector3(1, -2, 10) },
+  { position: new THREE.Vector3(-12, -2, 0), target: new THREE.Vector3(-10, -2, 10) },
+  { position: new THREE.Vector3(-2, -2, -5), target: new THREE.Vector3(-6, -2, -4) },
+];
+
+
+function CameraController({ step }: { step: number }) {
+  const cam = useRef<THREE.PerspectiveCamera>(null);
+  const currentTarget = useRef(new THREE.Vector3());
+
+  useFrame(() => {
+    if (!cam.current) return;
+
+    cam.current.position.lerp(cameraStops[step].position, 0.05);
+
+    currentTarget.current.lerp(cameraStops[step].target, 0.05);
+    cam.current.lookAt(currentTarget.current);
+  });
+
+  return <PerspectiveCamera ref={cam} makeDefault fov={50} />;
+}
+
+function MusicPlayer() {
+  const [playing, setPlaying] = useState(false);
+  const audio = new Audio("/backgroundMusic.mp3");
+
+  const toggleMusic = () => {
+    if (!playing) {
+      audio.loop = true;
+      audio.play();
+    } else {
+      audio.pause();
+    }
+    setPlaying(!playing);
+  };
+
+  return (
+    <div className="music-controls">
+      <button onClick={toggleMusic}>
+        {playing ? "Pause Music" : "Play Music"}
+      </button>
+    </div>
+  );
+}
+
+export default function App() {
+  const [step, setStep] = useState(0);
+
+  const next = () => setStep((s) => (s + 1) % cameraStops.length);
+  const prev = () => setStep((s) => (s - 1 + cameraStops.length) % cameraStops.length);
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+      <Canvas>
+        <Gallery />
+        <Environment files="/horn-koppe_spring_2k.hdr" background />
+        <CameraController step={step} />
+      </Canvas>
 
-export default App
+      <div className="controls">
+        <button onClick={prev}>Previous</button>
+        <button onClick={next}>Next</button>
+      </div>
+
+      <MusicPlayer/>
+    </>
+  );
+}
