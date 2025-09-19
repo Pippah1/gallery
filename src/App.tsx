@@ -46,7 +46,7 @@ function MusicPlayer() {
   
   const toggleMusic = () => {
     if (!audioRef.current) {
-      const audio = new Audio("/backgroundMusic.mp3");
+      const audio = new Audio("/music/backgroundMusic.mp3");
       audio.loop = true;
       audio.volume = 0.5;
       audioRef.current = audio;
@@ -72,8 +72,10 @@ function MusicPlayer() {
   );
 }
 
+
 export default function App() {
   const [step, setStep] = useState(0);
+  const [day, setDay] = useState(true);
 
   const next = () => setStep((s) => (s + 1) % cameraStops.length);
   const prev = () => setStep((s) => (s - 1 + cameraStops.length) % cameraStops.length);
@@ -82,13 +84,23 @@ export default function App() {
     <>
       <Canvas>
         <Gallery />
-        <Environment files="/horn-koppe_spring_2k.hdr" background />
+        {day ? (
+          <Environment files="/hdri/horn-koppe_spring_2k.hdr" background />
+        ) : (
+          <Environment files="/hdri/satara_night_2k.hdr" background />
+        )}
         <CameraController step={step} />
       </Canvas>
 
       <div className="controls">
         <button onClick={prev}>Previous</button>
         <button onClick={next}>Next</button>
+      </div>
+
+      <div className="environmentControls">
+        <button onClick={() => setDay((d) => !d)}>
+            {day ? "Switch to Night 🌙" : "Switch to Day ☀️"}
+        </button>
       </div>
 
       <MusicPlayer/>

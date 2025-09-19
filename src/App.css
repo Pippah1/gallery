@@ -11,7 +11,8 @@ canvas {
 }
 
 .controls,
-.music-controls {
+.music-controls,
+.environmentControls {
   position: absolute;
   display: flex;
   gap: 10px;
@@ -30,8 +31,14 @@ canvas {
   right: 20px;
 }
 
+.environmentControls {
+  top: 20px;
+  left: 20px;
+}
+
 .controls button,
-.music-controls button {
+.music-controls button,
+.environmentControls button {
   padding: 10px 20px;
   font-size: 16px;
   background-color: rgba(255, 255, 255, 0.8);
