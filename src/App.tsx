@@ -6,7 +6,6 @@ import * as THREE from "three";
 
 function Gallery() {
   const gltf = useGLTF("/scene.glb");
-  console.log(gltf.scene);
   return <primitive object={gltf.scene} />;
 }
 
@@ -16,7 +15,7 @@ interface CameraStop {
 }
 
 const cameraStops: CameraStop[] = [
-  { position: new THREE.Vector3(-2, 2, -12), target: new THREE.Vector3(-2, -1, -11) },
+  { position: new THREE.Vector3(-2 , 2, -11), target: new THREE.Vector3(-2, -1, -10) },
   { position: new THREE.Vector3(2, 3, 0), target: new THREE.Vector3(6, 0, 0) },
   { position: new THREE.Vector3(5, -2, 0), target: new THREE.Vector3(1, -2, 10) },
   { position: new THREE.Vector3(-12, -2, 0), target: new THREE.Vector3(-10, -2, 10) },
@@ -82,10 +81,10 @@ export default function App() {
 
   return (
     <>
-      <Canvas>
+      <Canvas gl={{ toneMappingExposure: 0.3 }}>
         <Gallery />
         {day ? (
-          <Environment files="/hdri/horn-koppe_spring_2k.hdr" background />
+            <Environment files="/hdri/bambanani_sunset_2k.hdr" background />
         ) : (
           <Environment files="/hdri/satara_night_2k.hdr" background />
         )}
